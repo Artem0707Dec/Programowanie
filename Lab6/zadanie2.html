@@ -1,0 +1,91 @@
+<html>
+<head>
+ <meta charset="utf-8">
+ <style>
+ #reset {display:inline-block;}
+ #stop {display:none;}
+ </style>
+</head>
+<body>
+ <h1 id="czas">
+ <span id="godziny">00</span>:<span id="minuty">00</span>:<span id="sekundy">00</span>
+ </h1>
+ <button id = "start">START</button>
+ <button id = "zapisz">ZAPISZ</button>
+ <button id = "stop">STOP</button>
+ <button id = "reset">RESET</button>
+ <p id = "stan_stopera"></p>
+ <ul id = "zapisane_czasy">
+ </ul>
+ <script>
+    let timerInterval;
+    let totalSeconds=0;
+    let savedCount=0;
+    const btnStart=document.getElementById('start');
+    const btnStop=document.getElementById('stop');
+    const btnZapisz=document.getElementById('zapisz');
+    const btnReset=document.getElementById('reset');
+    const pStan=document.getElementById('stan_stopera');
+    const ulZapisane=document.getElementById('zapisane_czasy');
+    const spanGodziny=document.getElementById('godziny');
+    const spanMinuty=document.getElementById('minuty');
+    const spanSekundy=document.getElementById('sekundy');
+    function updateDisplay(){
+        let h=Math.floor(totalSeconds/3600);
+        let m=Math.floor((totalSeconds%3600)/60);
+        let s = totalSeconds % 60;
+        spanGodziny.textContent=h.toString().padStart(2,'0');
+        spanMinuty.textContent=m.toString().padStart(2,'0');
+        spanSekundy.textContent=s.toString().padStart(2,'0');
+        return `${spanGodziny.textContent}:${spanMinuty.textContent}:${spanSekundy.textContent}`;}
+        function updateButtons(state){
+            if (state==='default'){
+                btnStart.style.display='inline-block';
+                btnZapisz.style.display='inline-block';
+                btnStop.style.display='none';
+                btnReset.style.display='none';
+            } else if (state==='running'){
+                btnStart.style.display='none';
+                btnZapisz.style.display='inline-block';
+                btnStop.style.display='inline-block';
+                btnReset.style.display='none';
+            }
+            else if (state==='paused'){
+                btnStart.style.display='inline-block';
+                btnZapisz.style.display='inline-block';
+                btnStop.style.display='none';
+                btnReset.style.display='inline-block';
+            }
+        }
+        updateButtons('default');
+        btnStart.addEventListener('click',()=>{
+            timerInterval=setInterval(()=>{
+                totalSeconds++;
+                updateDisplay();
+            },1000);
+            updateButtons('running');
+            pStan.textContent='Odliczanie...';
+        });
+        btnStop.addEventListener('click',()=>{
+            clearInterval(timerInterval);
+            updateButtons('paused');
+            pStan.textContent='Wstrzymano';
+        });
+        btnZapisz.addEventListener('click',()=>{
+            savedCount++;
+            const li=document.createElement('li');
+            li.textContent=`${savedCount}. ${updateDisplay()}`;
+            ulZapisane.appendChild(li);
+        });
+        btnReset.addEventListener('click',()=>{
+            clearInterval(timerInterval);
+            totalSeconds=0;
+            savedCount=0;
+            updateDisplay();
+            updateButtons('default');
+            pStan.textContent='';
+            ulZapisane.innerHTML='';
+        });
+ </script>
+</body>
+</html>
