@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lab 8</title>
+    </head>
+    <body>
+        <h2>Formularz Użytkownika</h2>
+        <form id="userForm">
+            <label>Imię: <input type="text" id="firstName" required></label><br><br>
+            <label>Nazwisko: <input type="text" id="lastName" required></label><br><br>
+            <label>Wiek: <input type="number" id="age" required></label><br><br>
+            <button type="submit">Zapisz i wyświetl </button>
+        </form>
+        <script>
+            document.getElementById('userForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const user={
+                    imie:document.getElementById('firstName').value,
+                    nazwisko:document.getElementById('lastName').value,
+                    wiek:Number(document.getElementById('age').value)
+                };
+                console.log("Cały obiekt:", user);
+                console.log("Imię:",user.imie);
+                console.log("Nazwisko:",user.nazwisko);
+                console.log("Wiek:",user.wiek);
+                const userJSON=JSON.stringify(user);
+                console.log("Obiekt w formacie JSON:", userJSON);
+            });
+            class ComplexNumber {
+                constructor(real, imaginary) {
+                    this.real = real;
+                    this.imaginary = imaginary;
+                }
+                wypisz(){
+                    if (this.imaginary<0){
+                    return
+                    `${this.real} - ${Math.abs(this.imaginary)}i`;
+                } else {
+                    return `${this.real} + ${this.imaginary}i`;
+                }
+                }
+                module() {
+                    return Math.sqrt(Math.pow(this.real, 2)+ Math.pow(this.imaginary, 2));
+                }
+            }
+            function generateComplexArrey(size) {
+                const arr = [];
+                for (let i=0; i< size;i++) {
+                    const r = Math.floor(Math.random() * 21)-10;
+                    const im=Math.floor(Math.random()*21)-10;
+                    arr.push(new
+                    ComplexNumber(r,im));
+                }
+                return arr;
+            }
+            const complexNumbers=generateComplexArrey(5);
+            complexNumbers.forEach(num=>console.log(`${num.wypisz()}(Moduł: ${num.module().toFixed(2)})`));
+            const positiveOnly=complexNumbers.filter(num=>num.real>0 && num.imaginary>0);
+            positiveOnly.forEach(num => console.log(num.wypisz()));
+            const swappedParts=complexNumbers.map(num => new
+            ComplexNumber(num.imaginary, num.real));
+            swappedParts.forEach(num => console.log(num.wypisz()));
+            const sumOfModules = complexNumbers.reduce((sum, num)=> sum + num.module(), 0);
+            console.log(`\nWynik: ${sumOfModules.toFixed(2)}`);
+            const minModule=complexNumbers.reduce((min, num)=> Math.min(min, num.module()), Infinity);
+            console.log(`\nWynik:${minModule.toFixed(2)}`);
+            const maxModuleNumber=complexNumbers.reduce((max0bj, num)=>
+        num.module() > max0bj.module() ? num :
+    max0bj, complexNumbers[0]);
+    console.log(`\nWynik: ${maxModuleNumber.wypisz()}`);
+        </script>
+    </body>
+</html>
