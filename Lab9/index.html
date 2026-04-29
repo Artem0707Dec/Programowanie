@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+        content="width=device-width,initial-scale=1.0">
+        <title>Obsidian Portal Clicker</title>
+        <style>
+            :root {
+                --bg-color:#1e1e24;
+                --text-color:#f8f8f2;
+                --accent-color:#9b59b6;
+                --button-bg:#2d2d34;
+                --button-hover:#3a3a44;
+            }
+            body {
+                font-family:
+                'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                text-align: center;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
+            }
+            h1 {color:var(--accent-color) ; font-size: 2.5rem; text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+            }
+            .game-container {
+                background: #25252b;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                max-width: 600px;
+                width: 100%;
+            }
+            .score-board {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                padding: 20px;
+                border: 2px dashed var(--accent-color);
+                border-radius: 10px;
+            }
+            .score-number {
+                font-size: 3rem;
+                font-weight: bold;
+                color: var(--accent-color);
+                display: block;
+                margin: 10px 0;
+            }
+            button {
+                background-color: var(--button-bg);
+                color: var(--accent-color);
+                border: 2px solid var(--accent-color);
+                padding: 15px 25px;
+                font-size: 1.1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                margin: 10px;
+                width: 80%;
+                font-weight: bold;
+            }
+            button:hover
+            {background-color: var(--button-hover); transform: translateY(-2px);}
+            button:active {transform: translateY(1px);}
+            button:disabled{border-color: #555; color: #777; cursor: not-allowed; transform: none;}
+            .main-click:hover
+            {background-color: #8e44ad;}
+            .upgrades {margin-top: 30px; display: flex; flex-direction: column; align-items: center;}
+            .upgrade-stats {font-size: 0.9rem; color:#aaa; margin-top: 5px; font-weight: normal;}
+            .student-info{margin-top: auto; padding-top: 20px; color: #666; font-size: 0.9rem;}   
+        </style>
+    </head>
+    <body>
+        <h1>Nether Portal Builder</h1>
+        <div class="game-container">
+            <div class="score-board">
+                Zwykły Obsydian:
+                <span class="score-number" id="scoreDisplay">0</span>
+                <span style="font-size: 1rem; color: #aaa;" id="cpsDisplay">0 na sekundę</span>
+            </div>
+            <button class="main-click" onclick="mineObsidian()">
+                Kop Obsydian 🔨 (+<span id="clickPowerDisplay">1</span>)
+            </button>
+            <div class="upgrades">
+                <h3>Ulepszenia:</h3>
+                <button id="btnClickUpgrade"
+                onclick="buyClickUpgrade()">
+                    Ulepsz Kilof
+                    <div class="upgrade-stats">Koszt: <span id="clickCostDisplay">10</span>obsydianu</div>
+                </button>
+                <button id="btnPassiveUpgrade"
+                onclick="buyPassiveUpgrade()">
+            Zbuduj Auto-Miner<div class="upgrade-stats">Koszt: <span id="passiveCostDisplay">50</span>obsydianu</div></button>
+            </div>
+        </div>
+        <footer class="student-info">Wyższa Szkoła Informatyki i Zarządzania w Rzeszowie | Album:73293</footer>
+        <script>
+            let game ={
+                score:0,
+                clickPower:1,
+                clickCost:10,
+                passiveCost:50,
+                lastSaveTime: Date.now()
+            };
+            const STORAGE_KEY ='obsydianClickerSave';
+            function loadGame(){
+                const savedData=localStorage.getItem(STORAGE_KEY);
+                if (savedData) {
+                    game = JSON.parse(savedData);
+                    const now = Date.now();
+                    const secondsOffline =Math.floor((now - game.lastSaveTime)/1000);
+                    if (secondsOffline>0 && game.passiveIncome >0) {
+                        const offlineEarnings = secondsOffline * game.passiveIncome;
+                        game.score +=offlineEarnings;
+                        alert(`Witaj ponownie! Podczas Twojej nieobecności Auto-Minery wydobyły ${offlineEarnings} bloków obsydianu.`);
+                    }
+                }
+                updateUI();
+            }
+            function saveGame(){
+                game.lastSaveTime = Date.now();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
+            }
+            function mineObsidian(){
+                game.score +=game.clickPower;
+                updateUI();
+            }
+            function buyClickUpgrade(){
+                if (game.score >= game.clickCost){
+                    game.score -=game.clickCost;
+                    game.clickPower +=1;
+                    game.clickCost=Math.floor(game.clickCost * 1.6);
+                    updateUI();
+                }
+            }
+            function buyPassiveUpgrade(){
+                if (game.score >=game.passiveCost){
+                    game.score -=game.passiveCost;
+                    game.passiveIncome +=1;
+                    game.passiveCost=Math.floor(game.passiveCost *1.5);
+                    updateUI();
+                }
+            }
+            function updateUI(){
+                document.getElementById('scoreDisplay').innerText=Math.floor(game.score);
+                document.getElementById('clickCostDisplay').innerText=game.clickCost;
+                document.getElementById('clickPowerDisplay').innerText=game.clickPower;
+                document.getElementById('passiveCostDisplay').innerText=game.passiveCost;
+                document.getElementById('cpsDisplay').innerText=`${game.passiveIncome} na sakundę`;
+                document.getElementById('btnPassiveUpgrade').disabled=game.score < game.passiveCost;
+                document.getElementById('btnClickUpgrade').disabled=game.score < 
+                game.clickCost;
+            }
+            setInterval(()=>{
+                if (game.passiveIncome > 0)
+            {
+                game.score +=game.passiveIncome;
+                updateUI();
+            }
+            saveGame();
+            },1000);
+            window.onload =loadGame;
+        </script>
+    </body>
+</html>
